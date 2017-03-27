@@ -1,10 +1,18 @@
+import sys
+
+#-----------------------------------------------------------------------
+#-----------------------------------------------------------------------
 #Declaration de la classe "facade"
+#-----------------------------------------------------------------------
+#-----------------------------------------------------------------------
+
+
 class Facade:
 	def __init__(self):
 		name = "facade"
 
 	def newStudent(self, firstname, lastname, age, avg):
-		return Student(firstname, lastname, age, avg)
+		Student(firstname, lastname, age, avg)
 
 	def getStudent(self, firstname):
 		for student in Student.getStudents():
@@ -14,7 +22,7 @@ class Facade:
 		return null
 
 	def newTeacher(self, firstname, lastname, age, subject):
-		return Teacher(firstname, lastname, age, subject)
+		Teacher(firstname, lastname, age, subject)
 
 	def getTeacher(self, firstname):
 		for teacher in Teacher.getTeachers():
@@ -24,7 +32,7 @@ class Facade:
 		return null
 
 	def newGroup(self, name, teacher, students):
-		return StudentGroup(name, teacher, students)
+		StudentGroup(name, teacher, students)
 
 	def getGroup(self, groupname):
 		for group in StudentGroup.getGroups():
@@ -63,18 +71,34 @@ class Facade:
 	def getGroupStudents(self, group):
 		return group.getStudents()
 
+	def printStudents(self):
+		string = "----------------------\n"
+		for student in Student.getStudents():
+			string += student.toString()
+
+		return string
+
+	def printTeachers(self):
+		string = "----------------------\n"
+		for teacher in Teacher.getTeachers():
+			string += teacher.toString()
+
+		return string
+
 	def printGroups(self):
-		string = ""
+		string = "----------------------\n"
 		for group in StudentGroup.getGroups():
 			string += group.toString()
 
 		return string
 
 
+#-----------------------------------------------------------------------
+#-----------------------------------------------------------------------
+#Declaration des classes du programme
+#-----------------------------------------------------------------------
+#-----------------------------------------------------------------------
 
-
-
-	
 
 #Declaration de la classe abstraite "Personne"
 class Person:
@@ -106,7 +130,7 @@ class Student(Person):
 		return self.avg
 
 	def toString(self):
-		return "Student fn: "+ self.getFirstname() + " student ln: "+ self.getLastname() + " Student age: "+ self.getAge()
+		return "Student firstname: "+ self.getFirstname() + "\nstudent lastname: "+ self.getLastname() + "\nStudent age: "+ str(self.getAge()) + "\n ----------------------\n"
 
 	@staticmethod
 	def getStudents():
@@ -135,7 +159,7 @@ class Teacher(Person):
 		return self.subject
 
 	def toString(self):
-		return "Teacher fn: "+ self.getFirstname() + " Teacher ln: "+ self.getLastname() + " Teacher age: "+ self.getAge()
+		return "Teacher firstname: "+ self.getFirstname() + "\nTeacher lastname: "+ self.getLastname() + "\nTeacher age: "+ str(self.getAge()) + "\n ----------------------\n"
 
 	@staticmethod
 	def getTeachers():
@@ -169,39 +193,116 @@ class StudentGroup:
 		for student in self.students:
 			studentString += student.getFirstname() + ", "
 
-		return "Group name:"+ self.name +"\n Group students: "+ studentString + "\n Teacher: "+ self.teacher.getFirstname() +"\n" 
+		return "Group name:"+ self.name +"\n Group students: "+ studentString + "\n Teacher: "+ self.teacher.getFirstname() +"\n----------------------\n" 
 
 
+#-----------------------------------------------------------------------
+#-----------------------------------------------------------------------
+#Declaration de la fonction "BASH"
+#-----------------------------------------------------------------------
+#-----------------------------------------------------------------------
+
+
+def bash(string, facade):
+	#Splitting the string in param
+	splitted = string.split()
+
+	#Different cases
+	#Exit
+	if (splitted[0] == "exit" or splitted[0] == "end"):
+		sys.exit()
+
+	#Cmd
+	if (splitted[0] == "cmd"):
+		print("--------------------------------------------")
+		print("List of all commands available")
+		print("-Create a student: newS firstname lastname age avg")
+		print("-Create a teacher: newT firstname lastname age subject")
+		print("-Create a group (note the - between students): newG groupName teacherName student1-student2-student3")
+		print("printS to get all the students")
+		print("printT to get all the teachers")
+		print("printG to get all the groups")
+
+		print("--------------------------------------------")
+		return
+
+	#Create a new student
+	if(splitted[0] == "newS"):
+		#First param = firstname
+		#Second param = lastname
+		#Third param = age
+		#Fourth param = avg
+		try:
+			facade.newStudent(splitted[1], splitted[2], splitted[3], splitted[4])
+			print("Created a new student with the firstname %s" %(splitted[1]))
+		except:
+			print("To create a new student, you need this syntax: newS firstname lastname age avg")
+
+		return
+
+	#Create a new teacher
+	if(splitted[0] == "newT"):
+		#First param = firstname
+		#Second param = lastname
+		#Third param = age
+		#Fourth param = subject
+		try:
+			facade.newTeacher(splitted[1], splitted[2], splitted[3], splitted[4])
+			print("Created a new teacher with the firstname %s" %(splitted[1]))
+		except:
+			print("To create a new teacher, you need this syntax: newT firstname lastname age subject")
+
+		return
+
+	#Create a new group
+	if(splitted[0] == "newG"):
+		#First param = group name
+		#Second param = teacher name
+		#Third param = array of students
+		
+		#Splitting the third parameters to get the different students name
+		studentsString=splitted[3].split('-')
+		studentsObject = []
+
+		#Finding all the objects "students" with the name given
+		for student in studentsString:
+			try:
+				studentsObject.append(facade.getStudent(student))
+			except:
+				print("Can't find the student with the name %s" % (student))
+
+		try:
+			facade.newGroup(splitted[1], facade.getTeacher(splitted[2]), studentsObject)
+			print("Created new group with the name %s" %(splitted[1])) 
+		except:
+			print("To create a new group, you need this syntax: newG groupName teacherFirstname student1-student2-student3")
+
+		return
+	if(splitted[0] == "printS"):
+		print(facade.printStudents())
+		return
+
+	if(splitted[0] == "printT"):
+		print(facade.printTeachers())
+		return
+
+	if(splitted[0] == "printG"):
+		print(facade.printGroups())
+		return
+
+	print("No command found!")
+	return
+
+#-----------------------------------------------------------------------
+#-----------------------------------------------------------------------
+#TESTS + main
+#NOTICE THAT WE ONLY USE THE FACADE OBJECT!
+#THIS IS THE PURPOSE OF THE DESIGN PATTERN!
+#-----------------------------------------------------------------------
+#-----------------------------------------------------------------------
 if __name__ == "__main__":
 	
-	#Testing without facade element
-	'''
-	combefis = Teacher("Sebastien", "Combefis", "30", "Informatique")
-	lorge = Teacher("Andre", "Lorge", "45", "Informatique")
-	yannick = Student("Yannick", "Berckmans", "23", "15")
-	charles = Student("Charles","Vandevoorde", "23", "18")
-	antoine = Student("Antoine", "VDM", "23", "15")
-	gaetano = Student("Gaetano", "Giordano", "24", "13")
-	group1 = StudentGroup("BestGroupEver", combefis, [yannick, charles])
-	group2 = StudentGroup("AnotherGroup", lorge, [antoine, gaetano])
 
-	print("Printing!")
-	print("-----------------------------------------------")
-	print("Every Teachers: ")
-	for teacher in Teacher.teachers:
-		print(teacher.toString())
-
-	print("-----------------------------------------------")
-	print("Every Students: ")
-	for student in Student.students:
-		print(student.toString())
-
-	print("-----------------------------------------------")
-	print("Every Groups: ")
-	for group in StudentGroup.groups:
-		print(group.toString())
-
-	'''
 
 	#Testing using only the facade Class
 	print("Creating students and teachers with the Facade Class...")
@@ -214,9 +315,18 @@ if __name__ == "__main__":
 	facade.newTeacher("Sebastien","Combefis",30,"Informatique")
 	facade.newTeacher("Andre","Lorge",45,"Informatique")
 
-	print("Finding those students and teachers and creating a group")
+	print("Creating the two first groups for the exemple...\n")
 	#name, teacher, students
 	facade.newGroup("BestGroupEver", facade.getTeacher("Sebastien"), [facade.getStudent("Yannick"),facade.getStudent("Charles")])
 	facade.newGroup("AnotherGroup", facade.getTeacher("Andre"), [facade.getStudent("Gaetano"),facade.getStudent("Antoine")])
 	print(facade.printGroups())
+	while True:
+		print("waiting for input (type cmd to get all the commands available)... ")
+		vinput = raw_input(">>>")
+		try:
+			bash(vinput,facade)	
+		except:
+			print("error")
+
+	
 	
