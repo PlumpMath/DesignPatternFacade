@@ -219,9 +219,9 @@ def bash(string, facade):
 		print("-Create a student: newS firstname lastname age avg")
 		print("-Create a teacher: newT firstname lastname age subject")
 		print("-Create a group (note the - between students): newG groupName teacherName student1-student2-student3")
-		print("printS to get all the students")
-		print("printT to get all the teachers")
-		print("printG to get all the groups")
+		print("-printS to get all the students")
+		print("-printT to get all the teachers")
+		print("-printG to get all the groups")
 
 		print("--------------------------------------------")
 		return
@@ -323,10 +323,9 @@ if __name__ == "__main__":
 	while True:
 		print("waiting for input (type cmd to get all the commands available)... ")
 		vinput = raw_input(">>>")
-		try:
-			bash(vinput,facade)	
-		except:
-			print("error")
+
+		bash(vinput,facade)	
+
 
 	
 	
